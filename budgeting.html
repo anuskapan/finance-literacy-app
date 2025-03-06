@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women's Budgeting Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url('https://www.incharge.org/wp-content/uploads/2015/10/Financial-Literacy-Header-Featured.jpg') no-repeat center center fixed;
+            background-size: contain;
+        }
+        h2 {
+            color: rgb(8, 8, 8);
+        }
+        .container {
+            perspective: 1000px;
+        }
+        .card-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            backface-visibility: hidden;
+            background: rgba(240, 236, 236, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        .btn-custom {
+            background-color: #ff69b4;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #ff1493;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center text-primary mb-4">Women's Budgeting Tool</h2>
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card-container" id="flipCard">
+                    <div class="card-front p-4">
+                        <h5 class="text-center mb-3">Manage Your Budget</h5>
+                        <div class="mb-3">
+                            <label for="income" class="form-label">Total Income:</label>
+                            <input type="number" id="income" class="form-control" placeholder="Enter your total income">
+                        </div>
+                        <div class="mb-3">
+                            <label for="expenseDesc" class="form-label">Expense Description:</label>
+                            <input type="text" id="expenseDesc" class="form-control" placeholder="E.g., Groceries">
+                        </div>
+                        <div class="mb-3">
+                            <label for="expenseAmount" class="form-label">Expense Amount:</label>
+                            <input type="number" id="expenseAmount" class="form-control" placeholder="Enter amount">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-custom" onclick="setIncome(event)">Set Income</button>
+                            <button class="btn btn-custom" onclick="addExpense(event)">Add Expense</button>
+                        </div>
+                    </div>
+                    <div class="card-back p-4">
+                        <h5>Summary:</h5>
+                        <p><strong>Total Income:</strong> ₹<span id="displayIncome">0</span></p>
+                        <p><strong>Total Expenses:</strong> ₹<span id="displayExpenses">0</span></p>
+                        <p><strong>Remaining Balance:</strong> ₹<span id="displayBalance">0</span></p>
+                        <h5 class="mt-4">Expense List:</h5>
+                        <ul id="expenseList" class="list-group"></ul>
+                        <button class="btn btn-secondary mt-3" onclick="flipCard()">Go Back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let totalIncome = localStorage.getItem("income") ? parseFloat(localStorage.getItem("income")) : 0;
+        let totalExpenses = localStorage.getItem("expenses") ? parseFloat(localStorage.getItem("expenses")) : 0;
+        let expenses = JSON.parse(localStorage.getItem("expenseList")) || [];
+
+        function updateUI() {
+            document.getElementById("displayIncome").innerText = totalIncome;
+            document.getElementById("displayExpenses").innerText = totalExpenses;
+            document.getElementById("displayBalance").innerText = totalIncome - totalExpenses;
+            let list = document.getElementById("expenseList");
+            list.innerHTML = "";
+            expenses.forEach((expense, index) => {
+                let li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+                li.innerHTML = `${expense.desc}: ₹${expense.amount} 
+                    <button class="btn btn-sm btn-danger" onclick="removeExpense(${index})">X</button>`;
+                list.appendChild(li);
+            });
+            localStorage.setItem("income", totalIncome);
+            localStorage.setItem("expenses", totalExpenses);
+            localStorage.setItem("expenseList", JSON.stringify(expenses));
+        }
+
+        function setIncome(event) {
+            event.stopPropagation();
+            let incomeInput = document.getElementById("income").value;
+            if (incomeInput === "" || incomeInput < 0) {
+                alert("Please enter a valid income amount!");
+                return;
+            }
+            totalIncome = parseFloat(incomeInput);
+            updateUI();
+        }
+
+        function addExpense(event) {
+            event.stopPropagation();
+            let desc = document.getElementById("expenseDesc").value;
+            let amount = document.getElementById("expenseAmount").value;
+            if (desc === "" || amount === "" || amount < 0) {
+                alert("Please enter a valid expense!");
+                return;
+            }
+            amount = parseFloat(amount);
+            totalExpenses += amount;
+            expenses.push({ desc, amount });
+            if (totalExpenses > totalIncome) {
+                alert("Warning: Your expenses exceed your income!");
+            }
+            updateUI();
+
+            // Flip the card after adding an expense
+            flipCard();
+        }
+
+        function removeExpense(index) {
+            totalExpenses -= expenses[index].amount;
+            expenses.splice(index, 1);
+            updateUI();
+        }
+
+        function flipCard() {
+            document.getElementById("flipCard").classList.toggle("flipped");
+        }
+
+        window.onload = updateUI;
+    </script>
+</body>
+</html>

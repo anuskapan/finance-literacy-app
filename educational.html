@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Financial Education for Women</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    
+    <style>
+        body {
+            background: url('https://www.incharge.org/wp-content/uploads/2015/10/Financial-Literacy-Header-Featured.jpg') no-repeat center center fixed;
+            background-size: contain;
+        }
+        h2 {
+            color: rgb(8, 8, 8);
+        }
+        .container {
+            perspective: 1000px;
+        }
+        .card-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+        }
+        .card-container:hover {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            backface-visibility: hidden;
+            background: rgba(240, 236, 236, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Financial Education</a>
+        </div>
+    </nav>
+
+    <!-- Educational Resources Section with Flip Effect -->
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Educational Resources</h2>
+        <div class="row" id="resource-container">
+            <!-- Cards will be inserted here via JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal for Detailed Learning -->
+    <div class="modal fade" id="resourceModal" tabindex="-1" aria-labelledby="resourceTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resourceTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="resourceContent">
+                    <!-- Content dynamically added -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS & Custom Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Data for educational resources
+            const resources = [
+                {
+                    title: "Budgeting Basics",
+                    description: "Learn how to manage your income, expenses, and savings efficiently.",
+                    content: "<p>Budgeting is essential for financial stability. Follow the <b>50-30-20</b> rule: <b>50%</b> for necessities such as rent, groceries, and utilities, <b>30%</b> for discretionary spending like entertainment and dining out, and <b>20%</b> for savings and debt repayment.</p>"
+                },
+                {
+                    title: "Investing for Beginners",
+                    description: "Understand how to grow your money through smart investments.",
+                    content: "<p>Investing allows your money to work for you over time through compound growth. Start with <b>mutual funds, SIPs</b>, and <b>low-risk assets</b> such as fixed deposits or government bonds.</p>"
+                },
+                {
+                    title: "Smart Saving Strategies",
+                    description: "Learn how to build an emergency fund and save for long-term goals.",
+                    content: "<p>Saving money is a crucial step toward financial security. Set aside at least <b>three to six months' worth of expenses</b> in an emergency fund and automate your savings.</p>"
+                }
+            ];
+
+            const resourceContainer = document.getElementById("resource-container");
+
+            // Generate Flip Cards Dynamically
+            resources.forEach((resource, index) => {
+                let card = `
+                    <div class="col-md-4">
+                        <div class="card-container">
+                            <div class="card-front">
+                                <h5 class="text-center">${resource.title}</h5>
+                                <p class="text-center">${resource.description}</p>
+                            </div>
+                            <div class="card-back">
+                                <button class="btn btn-light w-100" onclick="showResource(${index})">Learn More</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resourceContainer.innerHTML += card;
+            });
+
+            // Function to Open Modal with Dynamic Content
+            window.showResource = function(index) {
+                document.getElementById("resourceTitle").innerText = resources[index].title;
+                document.getElementById("resourceContent").innerHTML = resources[index].content;
+                let modal = new bootstrap.Modal(document.getElementById("resourceModal"));
+                modal.show();
+            }
+        });
+    </script>
+</body>
+</html>

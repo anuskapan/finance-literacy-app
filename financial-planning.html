@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Planning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background: url('https://blogs.dpuerp.in/images/blog/70/28-financial-planning-decisions.jpg');
+            background-size: cover;
+        }
+        
+        body { background-color: #f1efef; }
+        .container { max-width: 600px; margin-top: 30px; }
+        .table-container { margin-top: 20px; }
+        h2.text-center { color: red; } /* Ensuring Financial Planning text is red */
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="text-center">Financial Planning</h2>
+
+        <!-- Financial Goal Form -->
+        <form id="goalForm" class="card p-3 shadow">
+            <div class="mb-3">
+                <label for="goalName" class="form-label">Goal Name</label>
+                <input type="text" id="goalName" class="form-control" placeholder="E.g., Buy a Car" required>
+            </div>
+            <div class="mb-3">
+                <label for="targetAmount" class="form-label">Target Amount (₹)</label>
+                <input type="number" id="targetAmount" class="form-control" placeholder="Enter amount" required>
+            </div>
+            <div class="mb-3">
+                <label for="targetDate" class="form-label">Target Date</label>
+                <input type="date" id="targetDate" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Add Goal</button>
+        </form>
+
+        <!-- Goal List Table -->
+        <div class="table-container">
+            <h4 class="text-center mt-4">Your Goals</h4>
+            <table class="table table-bordered table-striped shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Goal</th>
+                        <th>Amount (₹)</th>
+                        <th>Target Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="goalList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const goalForm = document.getElementById("goalForm");
+            const goalList = document.getElementById("goalList");
+
+            // Load stored goals on page load
+            loadGoals();
+
+            // Handle form submission
+            goalForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+
+                const goalName = document.getElementById("goalName").value.trim();
+                const targetAmount = document.getElementById("targetAmount").value.trim();
+                const targetDate = document.getElementById("targetDate").value.trim();
+
+                if (goalName && targetAmount && targetDate) {
+                    addGoal(goalName, targetAmount, targetDate);
+                    goalForm.reset();
+                }
+            });
+
+            function addGoal(goalName, targetAmount, targetDate) {
+                const goals = JSON.parse(localStorage.getItem("financialGoals")) || [];
+                goals.push({ goalName, targetAmount, targetDate });
+                localStorage.setItem("financialGoals", JSON.stringify(goals));
+                loadGoals();
+            }
+
+            function loadGoals() {
+                goalList.innerHTML = "";
+                const goals = JSON.parse(localStorage.getItem("financialGoals")) || [];
+                goals.forEach((goal, index) => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${goal.goalName}</td>
+                        <td>₹${goal.targetAmount}</td>
+                        <td>${goal.targetDate}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="removeGoal(${index})">Delete</button></td>
+                    `;
+                    goalList.appendChild(row);
+                });
+            }
+
+            window.removeGoal = function(index) {
+                const goals = JSON.parse(localStorage.getItem("financialGoals")) || [];
+                goals.splice(index, 1);
+                localStorage.setItem("financialGoals", JSON.stringify(goals));
+                loadGoals();
+            };
+        });
+    </script>
+
+</body>
+</html>
