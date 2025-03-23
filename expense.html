@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investment Portfolio Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      
+            background: url('https://williambevins.com/wp-content/uploads/freshizer/4b489929ad74284ca2433389733bc2c0_long-run-investment-2000-c-90.jpg') no-repeat center center fixed;
+            background-size: contain;
+       
+    }
+    .tracker-container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+<div class="tracker-container">
+  <h2 class="text-center mb-4">Investment Portfolio Tracker</h2>
+
+  <form id="investmentForm" class="mb-4">
+    <div class="mb-3">
+      <label for="investmentName" class="form-label">Investment Name</label>
+      <input type="text" class="form-control" id="investmentName" placeholder="Enter Investment Name" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="investmentAmount" class="form-label">Amount (₹)</label>
+      <input type="number" class="form-control" id="investmentAmount" placeholder="Enter Amount" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="investmentDate" class="form-label">Investment Date</label>
+      <input type="date" class="form-control" id="investmentDate" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Add Investment</button>
+  </form>
+
+  <h3 class="text-center mb-3">Investment Portfolio</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Amount (₹)</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="portfolioTable">
+    </tbody>
+  </table>
+
+  <div class="text-end">
+    <h4>Total Investment: ₹<span id="totalAmount">0</span></h4>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    loadInvestments();
+  });
+
+  const form = document.getElementById("investmentForm");
+  const table = document.getElementById("portfolioTable");
+  const totalAmount = document.getElementById("totalAmount");
+  let total = 0;
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("investmentName").value;
+    const amount = parseFloat(document.getElementById("investmentAmount").value);
+    const date = document.getElementById("investmentDate").value;
+
+    if (name && amount && date) {
+      addInvestment(name, amount, date);
+      saveInvestments();
+      form.reset();
+    }
+  });
+
+  function addInvestment(name, amount, date) {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${name}</td>
+      <td>₹${amount.toFixed(2)}</td>
+      <td>${date}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteInvestment(this, ${amount})">Delete</button></td>
+    `;
+    table.appendChild(row);
+    total += amount;
+    totalAmount.innerText = total.toFixed(2);
+  }
+
+  function deleteInvestment(button, amount) {
+    button.closest("tr").remove();
+    total -= amount;
+    totalAmount.innerText = total.toFixed(2);
+    saveInvestments();
+  }
+
+  function saveInvestments() {
+    const investments = [];
+    document.querySelectorAll("#portfolioTable tr").forEach(row => {
+      const cells = row.children;
+      investments.push({
+        name: cells[0].textContent,
+        amount: parseFloat(cells[1].textContent.replace("₹", "")),
+        date: cells[2].textContent
+      });
+    });
+    localStorage.setItem("investments", JSON.stringify(investments));
+  }
+
+  function loadInvestments() {
+    const investments = JSON.parse(localStorage.getItem("investments")) || [];
+    total = 0;
+    investments.forEach(inv => {
+      addInvestment(inv.name, inv.amount, inv.date);
+    });
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
